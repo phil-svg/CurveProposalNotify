@@ -82,7 +82,7 @@ export async function telegramBotMain(env, eventEmitter) {
     let groupID;
     if (env == "prod") {
         telegramGroupToken = process.env.TELEGRAM_CURVE_PROPOSAL_MONITOR_PROD_KEY;
-        groupID = process.env.TELEGRAM_PROD_PROPOSAL_GROUP_ID;
+        groupID = process.env.TELEGRAM_PROD_GROUP_ID;
     }
     if (env == "test") {
         telegramGroupToken = process.env.TELEGRAM_CURVE_PROPOSAL_MONITOR_TEST_KEY;
@@ -91,9 +91,9 @@ export async function telegramBotMain(env, eventEmitter) {
     const bot = new TelegramBot(telegramGroupToken, { polling: true });
     bot.on("message", async (msg) => {
         if (msg && msg.text && msg.text.toLowerCase() === "bot u with us") {
-            await new Promise((resolve) => setTimeout(resolve, 680));
+            await new Promise((resolve) => setTimeout(resolve, 945));
             if (groupID) {
-                bot.sendMessage(msg.chat.id, "Yes ser!");
+                bot.sendMessage(msg.chat.id, "yep");
             }
         }
     });
