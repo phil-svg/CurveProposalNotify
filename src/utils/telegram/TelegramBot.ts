@@ -76,10 +76,9 @@ export async function formatProposalData(proposal: any): Promise<string> {
   const txHyperlink = getTxHashURLfromEtherscan(proposal.tx);
 
   return `
-    🗞️ New Proposal [${voteType}]
+    🗞️ New Proposal for ${voteType}
 
 ${proposal.metadata.trim().replace(/^"|"$/g, "")}
-
 Requirements: ${quorum}m veCRV | Support: ${support}%
 Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/", "gov.curve.fi")} |${hyperlink("https://curvemonitor.com/#/dao/proposals", "curvemonitor")} 
   `;
