@@ -38,7 +38,7 @@ const client = new ApolloClient({
 });
 const GET_LATEST_PROPOSAL_FULL = gql `
   {
-    proposals(first: 1, orderBy: startDate, orderDirection: desc) {
+    proposals(first: 10, orderBy: startDate, orderDirection: desc) {
       id
       tx
       voteId
@@ -93,7 +93,17 @@ export async function fetchLast10Proposal() {
         throw error;
     }
 }
-export async function getDecodedScript(voteId) {
+export async function fetchLast10ProposalLong() {
+    try {
+        const response = await client.query({ query: GET_LATEST_PROPOSAL_FULL });
+        return response.data;
+    }
+    catch (error) {
+        console.error("Error fetching data: ", error);
+        throw error;
+    }
+}
+export async function getVoteFromLAF(voteId) {
     const BASE_URL = "https://api-py.llama.airforce/curve/v1/dao/proposals";
     const endpoint = isNaN(voteId) || voteId <= 0 ? "parameter" : "ownership";
     const response = await fetch(`${BASE_URL}/${endpoint}/${voteId}`, {
@@ -106,6 +116,6 @@ export async function getDecodedScript(voteId) {
         throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const data = await response.json();
-    return data.script;
+    return data;
 }
 //# sourceMappingURL=Proposal.js.map

@@ -66,7 +66,7 @@ export function formatScript(script: string): string {
   return formattedOutput;
 }
 
-export async function formatProposalData(proposal: any): Promise<string> {
+export async function formatProposalData(proposal: any, metadata: string): Promise<string> {
   const voteType = proposal.voteType.toLowerCase().includes("ownership") ? "Ownership" : proposal.voteType.toLowerCase().includes("parameter") ? "Parameter" : proposal.voteType; // This will default to proposal.voteType if neither 'ownership' nor 'parameter' is found.
 
   const totalSupplyNumber = parseFloat(proposal.totalSupply) / 1e18;
@@ -78,7 +78,7 @@ export async function formatProposalData(proposal: any): Promise<string> {
   return `
     🗞️ New Proposal for ${voteType}
 
-${proposal.metadata.trim().replace(/^"|"$/g, "")}
+${metadata}
 Requirements: ${quorum}m veCRV | Support: ${support}%
 Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/", "gov.curve.fi")} |${hyperlink("https://curvemonitor.com/#/dao/proposals", "curvemonitor")} 
   `;

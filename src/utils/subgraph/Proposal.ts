@@ -43,7 +43,7 @@ const client = new ApolloClient({
 
 const GET_LATEST_PROPOSAL_FULL = gql`
   {
-    proposals(first: 1, orderBy: startDate, orderDirection: desc) {
+    proposals(first: 10, orderBy: startDate, orderDirection: desc) {
       id
       tx
       voteId
@@ -100,7 +100,46 @@ export async function fetchLast10Proposal(): Promise<any> {
   }
 }
 
-export async function getDecodedScript(voteId: number): Promise<string> {
+export async function fetchLast10ProposalLong(): Promise<any> {
+  try {
+    const response = await client.query({ query: GET_LATEST_PROPOSAL_FULL });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data: ", error);
+    throw error;
+  }
+}
+
+interface Vote {
+  voteId: number;
+  voteType: string;
+  creator: string;
+  startDate: number;
+  snapshotBlock: number;
+  ipfsMetadata: string;
+  metadata: string;
+  votesFor: string;
+  votesAgainst: string;
+  voteCount: number;
+  supportRequired: string;
+  minAcceptQuorum: string;
+  totalSupply: string;
+  executed: boolean;
+  tx: string;
+  creatorVotingPower: number;
+  script: string;
+  votes: VoteDetail[];
+}
+
+interface VoteDetail {
+  tx: string;
+  voteId: number;
+  voter: string;
+  supports: boolean;
+  stake: number;
+}
+
+export async function getVoteFromLAF(voteId: number): Promise<Vote> {
   const BASE_URL = "https://api-py.llama.airforce/curve/v1/dao/proposals";
 
   const endpoint = isNaN(voteId) || voteId <= 0 ? "parameter" : "ownership";
@@ -116,7 +155,7 @@ export async function getDecodedScript(voteId: number): Promise<string> {
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
 
-  const data = await response.json();
+  const data: Vote = await response.json();
 
-  return data.script;
+  return data;
 }
