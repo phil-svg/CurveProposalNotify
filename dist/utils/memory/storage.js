@@ -1,5 +1,5 @@
 import fs from "fs";
-const FILE_PATH = "./notified_ids.json";
+const FILE_PATH = "../notified_ids.json";
 export function getNotifiedIds() {
     if (!fs.existsSync(FILE_PATH)) {
         return [];

@@ -69,7 +69,7 @@ const GET_LATEST_PROPOSAL_FULL = gql `
 `;
 const GET_LATEST_PROPOSAL_SHORTEN = gql `
   {
-    proposals(first: 10, orderBy: startDate, orderDirection: desc) {
+    proposals(first: 20, orderBy: startDate, orderDirection: desc) {
       voteId
       tx
       voteType
@@ -83,14 +83,14 @@ const GET_LATEST_PROPOSAL_SHORTEN = gql `
     }
   }
 `;
-export async function fetchLast10Proposal() {
+export async function fetchLast20Proposal() {
     try {
         const response = await client.query({ query: GET_LATEST_PROPOSAL_SHORTEN });
         return response.data;
     }
     catch (error) {
-        console.error("Error fetching data: ", error);
-        throw error;
+        console.log("Error fetching data: ", error);
+        return null;
     }
 }
 export async function fetchLast10ProposalLong() {

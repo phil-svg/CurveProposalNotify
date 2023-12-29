@@ -75,7 +75,7 @@ const GET_LATEST_PROPOSAL_FULL = gql`
 
 const GET_LATEST_PROPOSAL_SHORTEN = gql`
   {
-    proposals(first: 10, orderBy: startDate, orderDirection: desc) {
+    proposals(first: 20, orderBy: startDate, orderDirection: desc) {
       voteId
       tx
       voteType
@@ -90,13 +90,29 @@ const GET_LATEST_PROPOSAL_SHORTEN = gql`
   }
 `;
 
-export async function fetchLast10Proposal(): Promise<any> {
+type Proposal = {
+  __typename: "Proposal";
+  voteId: string;
+  tx: string;
+  voteType: string;
+  creator: any;
+  metadata: string;
+  totalSupply: string;
+  supportRequired: string;
+  minAcceptQuorum: string;
+};
+
+type ProposalResponse = {
+  proposals: Proposal[];
+};
+
+export async function fetchLast20Proposal(): Promise<ProposalResponse | null> {
   try {
     const response = await client.query({ query: GET_LATEST_PROPOSAL_SHORTEN });
-    return response.data;
+    return response.data as ProposalResponse;
   } catch (error) {
-    console.error("Error fetching data: ", error);
-    throw error;
+    console.log("Error fetching data: ", error);
+    return null;
   }
 }
 
