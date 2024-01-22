@@ -1,6 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import { EventEmitter } from "events";
+import { checkIfVotePassed } from "../helper.js";
 dotenv.config({ path: "../.env" });
 
 function getTxHashURLfromEtherscan(txHash: string) {
@@ -80,6 +81,33 @@ export async function formatProposalData(proposal: any, metadata: string): Promi
 
 ${metadata}
 Requirements: ${quorum}m veCRV | Support: ${support}%
+Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/", "gov.curve.fi")} |${hyperlink("https://curvemonitor.com/#/dao/proposals", "curvemonitor")} 
+  `;
+}
+
+export async function formatPassedVoteData(proposal: any, metadata: string): Promise<string | null> {
+  const voteIsPassed = await checkIfVotePassed(proposal);
+
+  console.log("proposal", proposal);
+
+  console.log(proposal.voteId, "voteIsPassed", voteIsPassed);
+  if (!voteIsPassed) return null;
+
+  const totalSupplyNumber = parseFloat(proposal.totalSupply) / 1e18; // Convert total supply from WEI to Ether
+  const votesForNumber = parseFloat(proposal.votesFor) / 1e18; // Convert votes for from WEI to Ether
+  const votesAgainstNumber = parseFloat(proposal.votesAgainst) / 1e18; // Convert votes for from WEI to Ether
+  const quorumRequired = (totalSupplyNumber * parseFloat(proposal.minAcceptQuorum)) / 1e18;
+  const quorumAchieved = votesForNumber + votesAgainstNumber; // Quorum achieved is the votes for
+  const percentageYea = ((votesForNumber / quorumAchieved) * 100).toFixed(2); // Calculate percentage of yea votes
+
+  const txHyperlink = getTxHashURLfromEtherscan(proposal.tx);
+
+  return `
+  🗞️ Vote Passed ✓
+
+${metadata}
+
+Total Votes: ${(quorumAchieved / 1e6).toFixed(0)}m veCRV | Yea: ${percentageYea}%
 Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/", "gov.curve.fi")} |${hyperlink("https://curvemonitor.com/#/dao/proposals", "curvemonitor")} 
   `;
 }

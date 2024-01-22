@@ -38,7 +38,7 @@ const client = new ApolloClient({
 });
 const GET_LATEST_PROPOSAL_FULL = gql `
   {
-    proposals(first: 10, orderBy: startDate, orderDirection: desc) {
+    proposals(first: 25, orderBy: startDate, orderDirection: desc) {
       id
       tx
       voteId
@@ -67,40 +67,14 @@ const GET_LATEST_PROPOSAL_FULL = gql `
     }
   }
 `;
-const GET_LATEST_PROPOSAL_SHORTEN = gql `
-  {
-    proposals(first: 20, orderBy: startDate, orderDirection: desc) {
-      voteId
-      tx
-      voteType
-      creator {
-        id
-      }
-      metadata
-      totalSupply
-      supportRequired
-      minAcceptQuorum
-    }
-  }
-`;
-export async function fetchLast20Proposal() {
-    try {
-        const response = await client.query({ query: GET_LATEST_PROPOSAL_SHORTEN });
-        return response.data;
-    }
-    catch (error) {
-        console.log("Error fetching data: ", error);
-        return null;
-    }
-}
-export async function fetchLast10ProposalLong() {
+export async function fetchLast25Proposal() {
     try {
         const response = await client.query({ query: GET_LATEST_PROPOSAL_FULL });
         return response.data;
     }
     catch (error) {
-        console.error("Error fetching data: ", error);
-        throw error;
+        console.log("Error fetching data: ", error);
+        return null;
     }
 }
 export async function getVoteFromLAF(voteId) {

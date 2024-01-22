@@ -43,7 +43,7 @@ const client = new ApolloClient({
 
 const GET_LATEST_PROPOSAL_FULL = gql`
   {
-    proposals(first: 10, orderBy: startDate, orderDirection: desc) {
+    proposals(first: 25, orderBy: startDate, orderDirection: desc) {
       id
       tx
       voteId
@@ -73,23 +73,6 @@ const GET_LATEST_PROPOSAL_FULL = gql`
   }
 `;
 
-const GET_LATEST_PROPOSAL_SHORTEN = gql`
-  {
-    proposals(first: 20, orderBy: startDate, orderDirection: desc) {
-      voteId
-      tx
-      voteType
-      creator {
-        id
-      }
-      metadata
-      totalSupply
-      supportRequired
-      minAcceptQuorum
-    }
-  }
-`;
-
 type Proposal = {
   __typename: "Proposal";
   voteId: string;
@@ -106,23 +89,13 @@ type ProposalResponse = {
   proposals: Proposal[];
 };
 
-export async function fetchLast20Proposal(): Promise<ProposalResponse | null> {
+export async function fetchLast25Proposal(): Promise<ProposalResponse | null> {
   try {
-    const response = await client.query({ query: GET_LATEST_PROPOSAL_SHORTEN });
+    const response = await client.query({ query: GET_LATEST_PROPOSAL_FULL });
     return response.data as ProposalResponse;
   } catch (error) {
     console.log("Error fetching data: ", error);
     return null;
-  }
-}
-
-export async function fetchLast10ProposalLong(): Promise<any> {
-  try {
-    const response = await client.query({ query: GET_LATEST_PROPOSAL_FULL });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data: ", error);
-    throw error;
   }
 }
 
