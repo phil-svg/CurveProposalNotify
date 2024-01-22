@@ -21,7 +21,7 @@ export function getNotifiedIdsPassedVotes() {
     return JSON.parse(data);
 }
 export function storeNotifiedIdPassedVotes(id) {
-    const ids = getNotifiedIds();
+    const ids = getNotifiedIdsPassedVotes();
     ids.push(id);
     fs.writeFileSync(FILE_PATH_PASSED_VOTES, JSON.stringify(ids));
 }

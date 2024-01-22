@@ -38,10 +38,14 @@ async function fetchAndNotify_Passed_Votes() {
         if (typeof voteFromLAF.metadata !== "string" || voteFromLAF.metadata.length < 5)
             continue;
         const formattedPassedVote = await formatPassedVoteData(proposal, voteFromLAF.metadata);
-        if (!formattedPassedVote)
+        if (formattedPassedVote === "denied") {
+            storeNotifiedIdPassedVotes(Number(proposal.voteId));
             continue;
-        eventEmitter.emit("newMessage", formattedPassedVote);
-        storeNotifiedIdPassedVotes(Number(proposal.voteId));
+        }
+        if (formattedPassedVote) {
+            storeNotifiedIdPassedVotes(Number(proposal.voteId));
+            eventEmitter.emit("newMessage", formattedPassedVote);
+        }
         await sleep(1000); // Wait for 1 seconds
     }
 }

@@ -1,6 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
-import { checkIfVotePassed } from "../helper.js";
+import { checkIfVoteGotDenied, checkIfVotePassed } from "../helper.js";
 dotenv.config({ path: "../.env" });
 function getTxHashURLfromEtherscan(txHash) {
     return "https://etherscan.io/tx/" + txHash;
@@ -73,8 +73,11 @@ Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/
   `;
 }
 export async function formatPassedVoteData(proposal, metadata) {
+    const voteGotDenied = await checkIfVoteGotDenied(proposal);
+    if (voteGotDenied)
+        return "denied";
     const voteIsPassed = await checkIfVotePassed(proposal);
-    console.log("proposal", proposal);
+    // console.log("proposal", proposal);
     console.log(proposal.voteId, "voteIsPassed", voteIsPassed);
     if (!voteIsPassed)
         return null;
