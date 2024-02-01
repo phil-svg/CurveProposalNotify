@@ -78,7 +78,7 @@ export async function formatPassedVoteData(proposal, metadata) {
         return "denied";
     const voteIsPassed = await checkIfVotePassed(proposal);
     // console.log("proposal", proposal);
-    console.log(proposal.voteId, "voteIsPassed", voteIsPassed);
+    // console.log(proposal.voteId, "voteIsPassed", voteIsPassed);
     if (!voteIsPassed)
         return null;
     const totalSupplyNumber = parseFloat(proposal.totalSupply) / 1e18; // Convert total supply from WEI to Ether

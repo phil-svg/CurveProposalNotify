@@ -77,9 +77,9 @@ export async function fetchLast25Proposal() {
         return null;
     }
 }
-export async function getVoteFromLAF(voteId) {
+export async function getVoteFromLAF(voteId, voteType) {
     const BASE_URL = "https://api-py.llama.airforce/curve/v1/dao/proposals";
-    const endpoint = isNaN(voteId) || voteId <= 0 ? "parameter" : "ownership";
+    const endpoint = voteType.toLowerCase();
     const response = await fetch(`${BASE_URL}/${endpoint}/${voteId}`, {
         method: "GET",
         headers: {

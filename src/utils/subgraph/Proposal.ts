@@ -128,10 +128,10 @@ interface VoteDetail {
   stake: number;
 }
 
-export async function getVoteFromLAF(voteId: number): Promise<Vote> {
+export async function getVoteFromLAF(voteId: number, voteType: string): Promise<Vote> {
   const BASE_URL = "https://api-py.llama.airforce/curve/v1/dao/proposals";
 
-  const endpoint = isNaN(voteId) || voteId <= 0 ? "parameter" : "ownership";
+  const endpoint = voteType.toLowerCase();
 
   const response = await fetch(`${BASE_URL}/${endpoint}/${voteId}`, {
     method: "GET",
