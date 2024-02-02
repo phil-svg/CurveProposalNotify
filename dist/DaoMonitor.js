@@ -4,8 +4,8 @@ import { fetchLast25Proposal, getVoteFromLAF } from "./utils/subgraph/Proposal.j
 import { getNotifiedIds, getNotifiedIdsPassedVotes, storeNotifiedId, storeNotifiedIdPassedVotes } from "./utils/memory/storage.js";
 import { sleep } from "./utils/helper.js";
 console.clear();
-// const ENV = "prod";
-const ENV = "test";
+const ENV = "prod";
+// const ENV = "test";
 const eventEmitter = new EventEmitter();
 async function fetchAndNotify_New_Votes() {
     const reversedProposals = await fetchLast25Proposal();
@@ -16,7 +16,6 @@ async function fetchAndNotify_New_Votes() {
     for (const proposal of lastProposals) {
         if (notifiedIds.includes(Number(proposal.voteId)))
             continue;
-        console.log("proposal", proposal);
         const voteFromLAF = await getVoteFromLAF(Number(proposal.voteId), proposal.voteType);
         if (typeof voteFromLAF.metadata !== "string" || voteFromLAF.metadata.length < 5)
             continue;
