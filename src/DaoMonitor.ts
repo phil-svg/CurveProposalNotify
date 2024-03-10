@@ -73,3 +73,6 @@ async function main() {
 }
 
 await main();
+
+// https://curvemonitor.com/#/dao/proposal/parameter/80
+// https://curvemonitor.com/#/dao/proposal/gauge/643

@@ -60,4 +60,6 @@ async function main() {
     console.log("iteration complete, waiting for next cycle");
 }
 await main();
+// https://curvemonitor.com/#/dao/proposal/parameter/80
+// https://curvemonitor.com/#/dao/proposal/gauge/643
 //# sourceMappingURL=DaoMonitor.js.map

@@ -73,19 +73,42 @@ const GET_LATEST_PROPOSAL_FULL = gql`
   }
 `;
 
-type Proposal = {
+interface User {
+  __typename: "User";
+  id: string;
+}
+
+interface Execution {
+  __typename: "Execution";
+  id: string;
+}
+
+export interface Proposal {
   __typename: "Proposal";
-  voteId: string;
+  id: string;
   tx: string;
+  voteId: string;
   voteType: string;
-  creator: any;
+  creator: User;
+  startDate: string;
+  snapshotBlock: string;
+  ipfsMetadata: string;
   metadata: string;
+  minBalance: string;
+  minTime: string;
   totalSupply: string;
+  creatorVotingPower: string;
+  votesFor: string;
+  votesAgainst: string;
+  voteCount: string;
   supportRequired: string;
   minAcceptQuorum: string;
-};
+  executed: boolean;
+  execution: Execution;
+  script: string;
+}
 
-type ProposalResponse = {
+export type ProposalResponse = {
   proposals: Proposal[];
 };
 

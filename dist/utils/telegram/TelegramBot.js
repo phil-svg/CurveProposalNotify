@@ -60,6 +60,14 @@ export function formatScript(script) {
 }
 export async function formatProposalData(proposal, metadata) {
     const voteType = proposal.voteType.toLowerCase().includes("ownership") ? "Ownership" : proposal.voteType.toLowerCase().includes("parameter") ? "Parameter" : proposal.voteType; // This will default to proposal.voteType if neither 'ownership' nor 'parameter' is found.
+    let urlType;
+    if (voteType === "Ownership") {
+        urlType = "gauge";
+    }
+    else {
+        urlType = "parameter";
+    }
+    const curvemonitorURL = `https://curvemonitor.com/#/dao/proposal/${urlType}/${proposal.voteId}`;
     const totalSupplyNumber = parseFloat(proposal.totalSupply) / 1e18;
     const quorum = ((totalSupplyNumber * parseFloat(proposal.minAcceptQuorum)) / (1e18 * 1e6)).toFixed(0);
     const support = (parseFloat(proposal.supportRequired) / 1e16).toFixed(0);
@@ -69,7 +77,7 @@ export async function formatProposalData(proposal, metadata) {
 
 ${metadata}
 Requirements: ${quorum}m veCRV | Support: ${support}%
-Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/", "gov.curve.fi")} |${hyperlink("https://curvemonitor.com/#/dao/proposals", "curvemonitor")} 
+Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/", "gov.curve.fi")} |${hyperlink(curvemonitorURL, "curvemonitor")} 
   `;
 }
 export async function formatPassedVoteData(proposal, metadata) {
@@ -87,6 +95,15 @@ export async function formatPassedVoteData(proposal, metadata) {
     const quorumRequired = (totalSupplyNumber * parseFloat(proposal.minAcceptQuorum)) / 1e18;
     const quorumAchieved = votesForNumber + votesAgainstNumber; // Quorum achieved is the votes for
     const percentageYea = ((votesForNumber / quorumAchieved) * 100).toFixed(2); // Calculate percentage of yea votes
+    const voteType = proposal.voteType.toLowerCase().includes("ownership") ? "Ownership" : proposal.voteType.toLowerCase().includes("parameter") ? "Parameter" : proposal.voteType; // This will default to proposal.voteType if neither 'ownership' nor 'parameter' is found.
+    let urlType;
+    if (voteType === "Ownership") {
+        urlType = "gauge";
+    }
+    else {
+        urlType = "parameter";
+    }
+    const curvemonitorURL = `https://curvemonitor.com/#/dao/proposal/${urlType}/${proposal.voteId}`;
     const txHyperlink = getTxHashURLfromEtherscan(proposal.tx);
     return `
   🗞️ Vote Passed ✓
@@ -94,7 +111,7 @@ export async function formatPassedVoteData(proposal, metadata) {
 ${metadata}
 
 Total Votes: ${(quorumAchieved / 1e6).toFixed(0)}m veCRV | Yea: ${percentageYea}%
-Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/", "gov.curve.fi")} |${hyperlink("https://curvemonitor.com/#/dao/proposals", "curvemonitor")} 
+Links:${hyperlink(txHyperlink, "etherscan")} |${hyperlink("https://gov.curve.fi/", "gov.curve.fi")} |${hyperlink(curvemonitorURL, "curvemonitor")} 
   `;
 }
 export async function telegramBotMain(env, eventEmitter) {
