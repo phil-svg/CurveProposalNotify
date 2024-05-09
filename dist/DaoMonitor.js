@@ -1,10 +1,10 @@
-import { EventEmitter } from "events";
-import { formatPassedVoteData, formatProposalData, telegramBotMain } from "./utils/telegram/TelegramBot.js";
-import { fetchLast25Proposal, getVoteFromLAF } from "./utils/subgraph/Proposal.js";
-import { getNotifiedIds, getNotifiedIdsPassedVotes, storeNotifiedId, storeNotifiedIdPassedVotes } from "./utils/memory/storage.js";
-import { sleep } from "./utils/helper.js";
+import { EventEmitter } from 'events';
+import { formatPassedVoteData, formatProposalData, telegramBotMain } from './utils/telegram/TelegramBot.js';
+import { fetchLast25Proposal, getVoteFromLAF } from './utils/subgraph/Proposal.js';
+import { getNotifiedIds, getNotifiedIdsPassedVotes, storeNotifiedId, storeNotifiedIdPassedVotes, } from './utils/memory/storage.js';
+import { sleep } from './utils/helper.js';
 console.clear();
-const ENV = "prod";
+const ENV = 'prod';
 // const ENV = "test";
 const eventEmitter = new EventEmitter();
 async function fetchAndNotify_New_Votes() {
@@ -17,10 +17,10 @@ async function fetchAndNotify_New_Votes() {
         if (notifiedIds.includes(Number(proposal.voteId)))
             continue;
         const voteFromLAF = await getVoteFromLAF(Number(proposal.voteId), proposal.voteType);
-        if (typeof voteFromLAF.metadata !== "string" || voteFromLAF.metadata.length < 5)
+        if (typeof voteFromLAF.metadata !== 'string' || voteFromLAF.metadata.length < 5)
             continue;
         const formattedProposal = await formatProposalData(proposal, voteFromLAF.metadata);
-        eventEmitter.emit("newMessage", formattedProposal);
+        eventEmitter.emit('newMessage', formattedProposal);
         storeNotifiedId(Number(proposal.voteId));
         await sleep(1000); // Wait for 1 seconds
     }
@@ -35,16 +35,16 @@ async function fetchAndNotify_Passed_Votes() {
         if (notifiedIds.includes(Number(proposal.voteId)))
             continue;
         const voteFromLAF = await getVoteFromLAF(Number(proposal.voteId), proposal.voteType);
-        if (typeof voteFromLAF.metadata !== "string" || voteFromLAF.metadata.length < 5)
+        if (typeof voteFromLAF.metadata !== 'string' || voteFromLAF.metadata.length < 5)
             continue;
         const formattedPassedVote = await formatPassedVoteData(proposal, voteFromLAF.metadata);
-        if (formattedPassedVote === "denied") {
+        if (formattedPassedVote === 'denied') {
             storeNotifiedIdPassedVotes(Number(proposal.voteId));
             continue;
         }
         if (formattedPassedVote) {
             storeNotifiedIdPassedVotes(Number(proposal.voteId));
-            eventEmitter.emit("newMessage", formattedPassedVote);
+            eventEmitter.emit('newMessage', formattedPassedVote);
         }
         await sleep(1000); // Wait for 1 seconds
     }
@@ -57,9 +57,7 @@ async function main() {
         await fetchAndNotify_New_Votes();
         await fetchAndNotify_Passed_Votes();
     }, 60000);
-    console.log("iteration complete, waiting for next cycle");
+    console.log('iteration complete, waiting for next cycle');
 }
 await main();
-// https://curvemonitor.com/#/dao/proposal/parameter/80
-// https://curvemonitor.com/#/dao/proposal/gauge/643
 //# sourceMappingURL=DaoMonitor.js.map
