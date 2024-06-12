@@ -66,7 +66,7 @@ export async function formatProposalData(proposal, metadata) {
             : proposal.vote_type; // This will default to proposal.voteType if neither 'ownership' nor 'parameter' is found.
     let urlType;
     if (voteType === 'Ownership') {
-        urlType = 'gauge';
+        urlType = 'ownership';
     }
     else {
         urlType = 'parameter';
