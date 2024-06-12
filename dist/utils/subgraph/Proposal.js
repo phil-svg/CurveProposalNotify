@@ -1,5 +1,6 @@
-import pkg from "@apollo/client";
+import pkg from '@apollo/client';
 const { ApolloClient, InMemoryCache, gql } = pkg;
+import axios from 'axios';
 // ID: Qmf7HuQsR81yMrVH5hfAXEuZipzQpuKoHujuLSroqDvqWu
 // QUERIES (HTTP): https://api.thegraph.com/subgraphs/name/convex-community/curve-dao
 // from https://curve-subgraphs.gitbook.io/docs/curve-dao-subgraph/entities#proposal
@@ -33,7 +34,7 @@ const { ApolloClient, InMemoryCache, gql } = pkg;
 +----------------------+----------+----------------------------------------------+
 */
 const client = new ApolloClient({
-    uri: "https://api.thegraph.com/subgraphs/name/convex-community/curve-dao",
+    uri: 'https://api.thegraph.com/subgraphs/name/convex-community/curve-dao',
     cache: new InMemoryCache(),
 });
 const GET_LATEST_PROPOSAL_FULL = gql `
@@ -69,27 +70,12 @@ const GET_LATEST_PROPOSAL_FULL = gql `
 `;
 export async function fetchLast25Proposal() {
     try {
-        const response = await client.query({ query: GET_LATEST_PROPOSAL_FULL });
+        const response = await axios.get('https://prices.curve.fi/v1/dao/proposals?pagination=25&page=1&status_filter=all&type_filter=all');
         return response.data;
     }
     catch (error) {
-        console.log("Error fetching data: ", error);
+        console.log('Error fetching data: ', error);
         return null;
     }
-}
-export async function getVoteFromLAF(voteId, voteType) {
-    const BASE_URL = "https://api-py.llama.airforce/curve/v1/dao/proposals";
-    const endpoint = voteType.toLowerCase();
-    const response = await fetch(`${BASE_URL}/${endpoint}/${voteId}`, {
-        method: "GET",
-        headers: {
-            accept: "application/json",
-        },
-    });
-    if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
 }
 //# sourceMappingURL=Proposal.js.map

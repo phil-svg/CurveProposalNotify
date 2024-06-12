@@ -1,5 +1,6 @@
-import pkg from "@apollo/client";
+import pkg from '@apollo/client';
 const { ApolloClient, InMemoryCache, gql } = pkg;
+import axios from 'axios';
 
 // ID: Qmf7HuQsR81yMrVH5hfAXEuZipzQpuKoHujuLSroqDvqWu
 // QUERIES (HTTP): https://api.thegraph.com/subgraphs/name/convex-community/curve-dao
@@ -37,7 +38,7 @@ const { ApolloClient, InMemoryCache, gql } = pkg;
 */
 
 const client = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/convex-community/curve-dao",
+  uri: 'https://api.thegraph.com/subgraphs/name/convex-community/curve-dao',
   cache: new InMemoryCache(),
 });
 
@@ -74,52 +75,47 @@ const GET_LATEST_PROPOSAL_FULL = gql`
 `;
 
 interface User {
-  __typename: "User";
+  __typename: 'User';
   id: string;
 }
 
 interface Execution {
-  __typename: "Execution";
+  __typename: 'Execution';
   id: string;
 }
 
-export interface Proposal {
-  __typename: "Proposal";
-  id: string;
-  tx: string;
-  voteId: string;
-  voteType: string;
-  creator: User;
-  startDate: string;
-  snapshotBlock: string;
-  ipfsMetadata: string;
-  metadata: string;
-  minBalance: string;
-  minTime: string;
-  totalSupply: string;
-  creatorVotingPower: string;
-  votesFor: string;
-  votesAgainst: string;
-  voteCount: string;
-  supportRequired: string;
-  minAcceptQuorum: string;
-  executed: boolean;
-  execution: Execution;
-  script: string;
+export async function fetchLast25Proposal(): Promise<ProposalResponse | null> {
+  try {
+    const response = await axios.get(
+      'https://prices.curve.fi/v1/dao/proposals?pagination=25&page=1&status_filter=all&type_filter=all'
+    );
+    return response.data as ProposalResponse;
+  } catch (error) {
+    console.log('Error fetching data: ', error);
+    return null;
+  }
 }
 
 export type ProposalResponse = {
   proposals: Proposal[];
 };
 
-export async function fetchLast25Proposal(): Promise<ProposalResponse | null> {
-  try {
-    const response = await client.query({ query: GET_LATEST_PROPOSAL_FULL });
-    return response.data as ProposalResponse;
-  } catch (error) {
-    console.log("Error fetching data: ", error);
-    return null;
-  }
+export interface Proposal {
+  tx: string;
+  vote_id: number;
+  vote_type: string;
+  creator: string;
+  start_date: number;
+  snapshot_block: number;
+  ipfs_metadata: string;
+  metadata: string;
+  votes_for: string;
+  votes_against: string;
+  vote_count: number;
+  support_required: string;
+  min_accept_quorum: string;
+  total_supply: string;
+  executed: boolean;
 }
 
 interface Vote {
@@ -149,25 +145,4 @@ interface VoteDetail {
   voter: string;
   supports: boolean;
   stake: number;
-}
-
-export async function getVoteFromLAF(voteId: number, voteType: string): Promise<Vote> {
-  const BASE_URL = "https://api-py.llama.airforce/curve/v1/dao/proposals";
-
-  const endpoint = voteType.toLowerCase();
-
-  const response = await fetch(`${BASE_URL}/${endpoint}/${voteId}`, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
-  }
-
-  const data: Vote = await response.json();
-
-  return data;
 }

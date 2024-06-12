@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { EventEmitter } from 'events';
 import { checkIfVoteGotDenied, checkIfVotePassed } from '../helper.js';
 import { Proposal } from '../subgraph/Proposal.js';
+
 dotenv.config({ path: '../.env' });
 
 function getTxHashURLfromEtherscan(txHash: string) {
@@ -71,25 +72,31 @@ export function formatScript(script: string): string {
 }
 
 export async function formatProposalData(proposal: Proposal, metadata: string): Promise<string> {
-  const voteType = proposal.voteType.toLowerCase().includes('ownership')
+  const voteType = proposal.vote_type.toLowerCase().includes('ownership')
     ? 'Ownership'
-    : proposal.voteType.toLowerCase().includes('parameter')
+    : proposal.vote_type.toLowerCase().includes('parameter')
     ? 'Parameter'
-    : proposal.voteType; // This will default to proposal.voteType if neither 'ownership' nor 'parameter' is found.
+    : proposal.vote_type; // This will default to proposal.voteType if neither 'ownership' nor 'parameter' is found.
   let urlType;
   if (voteType === 'Ownership') {
     urlType = 'gauge';
   } else {
     urlType = 'parameter';
   }
-  const curvemonitorURL = `https://curvemonitor.com/#/dao/proposal/${urlType}/${proposal.voteId}`;
-  const crvHubURL = `https://crvhub.com/governance/${voteType.toLowerCase()}/${proposal.voteId}`;
+  const curvemonitorURL = `https://curvemonitor.com/#/dao/proposal/${urlType}/${proposal.vote_id}`;
+  const crvHubURL = `https://crvhub.com/governance/${voteType.toLowerCase()}/${proposal.vote_id}`;
 
-  const totalSupplyNumber = parseFloat(proposal.totalSupply) / 1e18;
-  const quorum = ((totalSupplyNumber * parseFloat(proposal.minAcceptQuorum)) / (1e18 * 1e6)).toFixed(0);
-  const support = (parseFloat(proposal.supportRequired) / 1e16).toFixed(0);
+  const totalSupplyNumber = parseFloat(proposal.total_supply) / 1e18;
+  const quorum = ((totalSupplyNumber * parseFloat(proposal.min_accept_quorum)) / (1e18 * 1e6)).toFixed(0);
+  const support = (parseFloat(proposal.support_required) / 1e16).toFixed(0);
 
-  const txHyperlink = getTxHashURLfromEtherscan(proposal.tx);
+  let txHash = '';
+  if (!proposal.tx) {
+    txHash = 'txHash coming soon';
+  } else {
+    txHash = getTxHashURLfromEtherscan(proposal.tx);
+  }
+  let txHyperlink = getTxHashURLfromEtherscan(txHash);
 
   return `
     🗞️ New Proposal for ${voteType}
@@ -113,28 +120,34 @@ export async function formatPassedVoteData(proposal: Proposal, metadata: string)
 
   if (!voteIsPassed) return null;
 
-  const totalSupplyNumber = parseFloat(proposal.totalSupply) / 1e18; // Convert total supply from WEI to Ether
-  const votesForNumber = parseFloat(proposal.votesFor) / 1e18; // Convert votes for from WEI to Ether
-  const votesAgainstNumber = parseFloat(proposal.votesAgainst) / 1e18; // Convert votes for from WEI to Ether
-  const quorumRequired = (totalSupplyNumber * parseFloat(proposal.minAcceptQuorum)) / 1e18;
+  const totalSupplyNumber = parseFloat(proposal.total_supply) / 1e18; // Convert total supply from WEI to Ether
+  const votesForNumber = parseFloat(proposal.votes_for) / 1e18; // Convert votes for from WEI to Ether
+  const votesAgainstNumber = parseFloat(proposal.votes_against) / 1e18; // Convert votes for from WEI to Ether
+  const quorumRequired = (totalSupplyNumber * parseFloat(proposal.min_accept_quorum)) / 1e18;
   const quorumAchieved = votesForNumber + votesAgainstNumber; // Quorum achieved is the votes for
   const percentageYea = ((votesForNumber / quorumAchieved) * 100).toFixed(2); // Calculate percentage of yea votes
 
-  const voteType = proposal.voteType.toLowerCase().includes('ownership')
+  const voteType = proposal.vote_type.toLowerCase().includes('ownership')
     ? 'Ownership'
-    : proposal.voteType.toLowerCase().includes('parameter')
+    : proposal.vote_type.toLowerCase().includes('parameter')
     ? 'Parameter'
-    : proposal.voteType; // This will default to proposal.voteType if neither 'ownership' nor 'parameter' is found.
+    : proposal.vote_type; // This will default to proposal.voteType if neither 'ownership' nor 'parameter' is found.
   let urlTypeCurveMonitor;
   if (voteType === 'Ownership') {
     urlTypeCurveMonitor = 'gauge';
   } else {
     urlTypeCurveMonitor = 'parameter';
   }
-  const curvemonitorURL = `https://curvemonitor.com/#/dao/proposal/${urlTypeCurveMonitor}/${proposal.voteId}`;
-  const crvHubURL = `https://crvhub.com/governance/${voteType.toLowerCase()}/${proposal.voteId}`;
+  const curvemonitorURL = `https://curvemonitor.com/#/dao/proposal/${urlTypeCurveMonitor}/${proposal.vote_id}`;
+  const crvHubURL = `https://crvhub.com/governance/${voteType.toLowerCase()}/${proposal.vote_id}`;
 
-  const txHyperlink = getTxHashURLfromEtherscan(proposal.tx);
+  let txHash = '';
+  if (!proposal.tx) {
+    txHash = 'txHash coming soon';
+  } else {
+    txHash = proposal.tx;
+  }
+  const txHyperlink = getTxHashURLfromEtherscan(txHash);
 
   return `
   🗞️ Vote Passed ✓
