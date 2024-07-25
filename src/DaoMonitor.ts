@@ -11,8 +11,8 @@ import { sleep } from './utils/helper.js';
 
 console.clear();
 
-const ENV = 'prod';
-// const ENV = 'test';
+// const ENV = 'prod';
+const ENV = 'test';
 
 const eventEmitter = new EventEmitter();
 
