@@ -90,13 +90,7 @@ export async function formatProposalData(proposal: Proposal, metadata: string): 
   const quorum = ((totalSupplyNumber * parseFloat(proposal.min_accept_quorum)) / (1e18 * 1e6)).toFixed(0);
   const support = (parseFloat(proposal.support_required) / 1e16).toFixed(0);
 
-  let txHash = '';
-  if (!proposal.tx) {
-    txHash = 'txHash coming soon';
-  } else {
-    txHash = getTxHashURLfromEtherscan(proposal.tx);
-  }
-  let txHyperlink = getTxHashURLfromEtherscan(txHash);
+  const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
 
   return `
     🗞️ New Proposal for ${voteType}
@@ -141,13 +135,7 @@ export async function formatPassedVoteData(proposal: Proposal, metadata: string)
   const curvemonitorURL = `https://curvemonitor.com/#/dao/proposal/${urlTypeCurveMonitor}/${proposal.vote_id}`;
   const crvHubURL = `https://crvhub.com/governance/${voteType.toLowerCase()}/${proposal.vote_id}`;
 
-  let txHash = '';
-  if (!proposal.tx) {
-    txHash = 'txHash coming soon';
-  } else {
-    txHash = proposal.tx;
-  }
-  const txHyperlink = getTxHashURLfromEtherscan(txHash);
+  const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
 
   return `
   🗞️ Vote Passed ✓
