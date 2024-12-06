@@ -83,8 +83,9 @@ export async function formatProposalData(proposal: Proposal, metadata: string): 
   } else {
     urlType = 'parameter';
   }
-  const curvemonitorURL = `https://curvemonitor.com/#/dao/proposal/${urlType}/${proposal.vote_id}`;
+  const curvemonitorURL = `https://curvemonitor.com/dao/proposal/${urlType}/${proposal.vote_id}`;
   const crvHubURL = `https://crvhub.com/governance/${voteType.toLowerCase()}/${proposal.vote_id}`;
+  const curveURL = `https://dao.curve.fi/#/ethereum/proposals/${proposal.vote_id}-${voteType.toUpperCase()}`;
 
   const totalSupplyNumber = parseFloat(proposal.total_supply) / 1e18;
   const quorum = ((totalSupplyNumber * parseFloat(proposal.min_accept_quorum)) / (1e18 * 1e6)).toFixed(0);
@@ -97,7 +98,7 @@ export async function formatProposalData(proposal: Proposal, metadata: string): 
 
 ${metadata}
 Requirements: ${quorum}m veCRV | Support: ${support}%
-Links:${hyperlink(txHyperlink, 'etherscan')} |${hyperlink('https://gov.curve.fi/', 'gov.curve.fi')} |${hyperlink(
+Links:${hyperlink(txHyperlink, 'etherscan')} |${hyperlink(curveURL, 'dao.curve.fi')} |${hyperlink(
     curvemonitorURL,
     'curvemonitor'
   )} |${hyperlink(crvHubURL, 'crvhub')}
