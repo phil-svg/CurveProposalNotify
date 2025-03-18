@@ -93,6 +93,8 @@ export async function formatProposalData(proposal: Proposal, metadata: string): 
 
   const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
 
+  metadata = metadata.replace(/<>/g, '≺≻');
+
   return `
     🗞️ New Proposal for ${voteType}
 

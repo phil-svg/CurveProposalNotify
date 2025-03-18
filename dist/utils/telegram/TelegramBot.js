@@ -78,6 +78,7 @@ export async function formatProposalData(proposal, metadata) {
     const quorum = ((totalSupplyNumber * parseFloat(proposal.min_accept_quorum)) / (1e18 * 1e6)).toFixed(0);
     const support = (parseFloat(proposal.support_required) / 1e16).toFixed(0);
     const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
+    metadata = metadata.replace(/<>/g, '≺≻');
     return `
     🗞️ New Proposal for ${voteType}
 
