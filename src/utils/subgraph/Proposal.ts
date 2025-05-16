@@ -3,7 +3,7 @@ import axios from 'axios';
 export async function fetchLast25Proposal(): Promise<ProposalResponse | null> {
   try {
     const response = await axios.get(
-      'https://prices.curve.fi/v1/dao/proposals?pagination=25&page=1&status_filter=all&type_filter=all'
+      'https://prices.curve.finance/v1/dao/proposals?pagination=25&page=1&status_filter=all&type_filter=all'
     );
     return response.data as ProposalResponse;
   } catch (error) {
