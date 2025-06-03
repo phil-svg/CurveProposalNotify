@@ -85,7 +85,7 @@ export async function formatProposalData(proposal: Proposal, metadata: string): 
   }
   const curvemonitorURL = `https://curvemonitor.com/dao/proposal/${urlType}/${proposal.vote_id}`;
   const crvHubURL = `https://crvhub.com/governance/${voteType.toLowerCase()}/${proposal.vote_id}`;
-  const curveURL = `https://curve.finance/dao/ethereum/proposals/${proposal.vote_id}-${voteType.toUpperCase()}`;
+  const curveURL = `https://curve.finance/dao/ethereum/proposals/${proposal.vote_id}-${voteType.toLowerCase()}`;
 
   const totalSupplyNumber = parseFloat(proposal.total_supply) / 1e18;
   const quorum = ((totalSupplyNumber * parseFloat(proposal.min_accept_quorum)) / (1e18 * 1e6)).toFixed(0);
