@@ -127,27 +127,30 @@ Links:${hyperlink(txHyperlink, 'etherscan')} |${hyperlink('https://gov.curve.fin
   `;
 }
 export async function telegramBotMain(env, eventEmitter) {
-    eventEmitter.on('newMessage', (message) => {
-        if (groupID) {
-            send(bot, message, parseInt(groupID));
-        }
-    });
-    let telegramGroupToken;
-    let groupID;
-    if (env == 'prod') {
-        telegramGroupToken = process.env.TELEGRAM_CURVE_PROPOSAL_MONITOR_PROD_KEY;
-        groupID = process.env.TELEGRAM_PROD_GROUP_ID;
-    }
-    if (env == 'test') {
-        telegramGroupToken = process.env.TELEGRAM_CURVE_PROPOSAL_MONITOR_TEST_KEY;
-        groupID = process.env.TELEGRAM_TEST_GROUP_ID;
-    }
-    const bot = new TelegramBot(telegramGroupToken, { polling: true });
-    bot.on('message', async (msg) => {
-        if (msg && msg.text && msg.text.toLowerCase() === 'bot u with us') {
-            await new Promise((resolve) => setTimeout(resolve, 945));
-            if (groupID) {
-                bot.sendMessage(msg.chat.id, 'yep');
+    const token = env === 'prod'
+        ? process.env.TELEGRAM_CURVE_PROPOSAL_MONITOR_PROD_KEY
+        : process.env.TELEGRAM_CURVE_PROPOSAL_MONITOR_TEST_KEY;
+    const groupIdMonitor = env === 'prod' ? process.env.TELEGRAM_PROD_GROUP_ID : process.env.TELEGRAM_TEST_GROUP_ID;
+    const groupIdDiscussion = env === 'prod'
+        ? process.env.TELEGRAM_PROD_GROUP_ID_DISCUSSION
+        : process.env.TELEGRAM_TEST_GROUP_ID_DISCUSSION || process.env.TELEGRAM_TEST_GROUP_ID;
+    if (!token)
+        throw new Error('Missing TELEGRAM token');
+    if (!groupIdMonitor)
+        throw new Error('Missing monitor group id');
+    if (!groupIdDiscussion)
+        throw new Error('Missing discussion group id');
+    const CHAT_IDS = [Number(groupIdMonitor), Number(groupIdDiscussion)];
+    // No polling: we can still send messages just fine.
+    const bot = new TelegramBot(token, { polling: false });
+    bot.on('error', (err) => console.error('[telegram_error]', (err === null || err === void 0 ? void 0 : err.message) || err));
+    eventEmitter.on('newMessage', async (message) => {
+        for (const chatId of CHAT_IDS) {
+            try {
+                await bot.sendMessage(chatId, message);
+            }
+            catch (e) {
+                console.error(`[send error -> ${chatId}]`, (e === null || e === void 0 ? void 0 : e.message) || e);
             }
         }
     });
