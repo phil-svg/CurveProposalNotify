@@ -147,7 +147,7 @@ export async function telegramBotMain(env, eventEmitter) {
     eventEmitter.on('newMessage', async (message) => {
         for (const chatId of CHAT_IDS) {
             try {
-                await bot.sendMessage(chatId, message);
+                send(bot, message, chatId);
             }
             catch (e) {
                 console.error(`[send error -> ${chatId}]`, (e === null || e === void 0 ? void 0 : e.message) || e);
