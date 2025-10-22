@@ -131,9 +131,7 @@ export async function telegramBotMain(env, eventEmitter) {
         ? process.env.TELEGRAM_CURVE_PROPOSAL_MONITOR_PROD_KEY
         : process.env.TELEGRAM_CURVE_PROPOSAL_MONITOR_TEST_KEY;
     const groupIdMonitor = env === 'prod' ? process.env.TELEGRAM_PROD_GROUP_ID : process.env.TELEGRAM_TEST_GROUP_ID;
-    const groupIdDiscussion = env === 'prod'
-        ? process.env.TELEGRAM_PROD_GROUP_ID_DISCUSSION
-        : process.env.TELEGRAM_TEST_GROUP_ID_DISCUSSION || process.env.TELEGRAM_TEST_GROUP_ID;
+    const groupIdDiscussion = env === 'prod' ? process.env.TELEGRAM_PROD_GROUP_ID_DISCUSSION : process.env.TELEGRAM_TEST_GROUP_ID;
     if (!token)
         throw new Error('Missing TELEGRAM token');
     if (!groupIdMonitor)
