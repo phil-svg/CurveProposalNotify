@@ -1,7 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
 import { EventEmitter } from 'events';
-import { checkIfVoteGotDenied, checkIfVotePassed } from '../helper.js';
+import { checkIfIDisTrusted, checkIfVoteGotDenied, checkIfVotePassed } from '../helper.js';
 import { Proposal } from '../subgraph/Proposal.js';
 
 dotenv.config({ path: '../.env' });
@@ -91,9 +91,14 @@ export async function formatProposalData(proposal: Proposal, metadata: string): 
   const quorum = ((totalSupplyNumber * parseFloat(proposal.min_accept_quorum)) / (1e18 * 1e6)).toFixed(0);
   const support = (parseFloat(proposal.support_required) / 1e16).toFixed(0);
 
+  const trusted = await checkIfIDisTrusted(proposal.vote_id);
+
   const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
 
   metadata = metadata.replace(/<>/g, '≺≻');
+  if (!trusted) {
+    metadata = metadata + '\n⚠️ Gauge was not deployed from trusted factory.';
+  }
 
   return `
     🗞️ New Proposal for ${voteType}
