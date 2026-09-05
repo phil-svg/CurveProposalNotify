@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import { formatPassedVoteData, formatProposalData, telegramBotMain } from './utils/telegram/TelegramBot.js';
 import { fetchLast25Proposal } from './utils/subgraph/Proposal.js';
+import { decideAuditHandling, fetchProposalAudit } from './utils/audit/ProposalTrace.js';
 import {
   getNotifiedIds,
   getNotifiedIdsPassedVotes,
@@ -28,7 +29,14 @@ async function fetchAndNotify_New_Votes() {
 
     if (typeof proposal.metadata !== 'string' || proposal.metadata.length < 5) continue;
 
-    const formattedProposal = await formatProposalData(proposal, proposal.metadata);
+    const audit = await fetchProposalAudit(proposal.vote_type, proposal.vote_id);
+    const decision = decideAuditHandling(proposal, audit, Math.floor(Date.now() / 1000));
+
+    // audit pending: not stored as notified, so the 60s cycle retries once per minute
+    // for up to 90 minutes; after that the message goes out in the old format unchanged
+    if (decision === 'wait') continue;
+
+    const formattedProposal = await formatProposalData(proposal, proposal.metadata, decision === 'enrich' ? audit : null);
     eventEmitter.emit('newMessage', formattedProposal);
 
     storeNotifiedId(Number(proposal.vote_id));

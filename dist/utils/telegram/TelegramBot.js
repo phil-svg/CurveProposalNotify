@@ -1,6 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
 import { checkIfIDisTrusted, checkIfVoteGotDenied, checkIfVotePassed } from '../helper.js';
+import { isAuditComplete } from '../audit/ProposalTrace.js';
 dotenv.config({ path: '../.env' });
 function getTxHashURLfromEtherscan(txHash) {
     return 'https://etherscan.io/tx/' + txHash;
@@ -58,7 +59,19 @@ export function formatScript(script) {
     }
     return formattedOutput;
 }
-export async function formatProposalData(proposal, metadata) {
+function escapeHtml(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+// Returns '\n' when there is no audit so the message stays byte-identical to the old format.
+function buildAuditBlock(audit) {
+    var _a, _b;
+    if (!audit || !isAuditComplete(audit))
+        return '\n';
+    const level = (_b = (_a = audit.assessment.risk) === null || _a === void 0 ? void 0 : _a.level) !== null && _b !== void 0 ? _b : 'unknown';
+    const label = level.charAt(0).toUpperCase() + level.slice(1);
+    return `\n\nyRisk Agentic Review:\n${escapeHtml(audit.assessment.summary)} Risk: ${label}.\n\n`;
+}
+export async function formatProposalData(proposal, metadata, audit = null) {
     const voteType = proposal.vote_type.toLowerCase().includes('ownership')
         ? 'Ownership'
         : proposal.vote_type.toLowerCase().includes('parameter')
@@ -78,6 +91,7 @@ export async function formatProposalData(proposal, metadata) {
     const quorum = ((totalSupplyNumber * parseFloat(proposal.min_accept_quorum)) / (1e18 * 1e6)).toFixed(0);
     const support = (parseFloat(proposal.support_required) / 1e16).toFixed(0);
     const trusted = await checkIfIDisTrusted(proposal.vote_id);
+    const auditBlock = buildAuditBlock(audit);
     const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
     metadata = metadata.replace(/<>/g, '≺≻');
     if (!trusted) {
@@ -86,8 +100,7 @@ export async function formatProposalData(proposal, metadata) {
     return `
     🗞️ New Proposal for ${voteType}
 
-${metadata}
-Requirements: ${quorum}m veCRV | Support: ${support}%
+${metadata}${auditBlock}Requirements: ${quorum}m veCRV | Support: ${support}%
 Links:${hyperlink(txHyperlink, 'etherscan')} |${hyperlink(curveURL, 'dao.curve.finance')} |${hyperlink(curvemonitorURL, 'curvemonitor')} |${hyperlink(crvHubURL, 'crvhub')}
   `;
 }

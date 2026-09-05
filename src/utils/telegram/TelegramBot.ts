@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { EventEmitter } from 'events';
 import { checkIfIDisTrusted, checkIfVoteGotDenied, checkIfVotePassed } from '../helper.js';
 import { Proposal } from '../subgraph/Proposal.js';
+import { ProposalAudit, isAuditComplete } from '../audit/ProposalTrace.js';
 
 dotenv.config({ path: '../.env' });
 
@@ -71,7 +72,23 @@ export function formatScript(script: string): string {
   return formattedOutput;
 }
 
-export async function formatProposalData(proposal: Proposal, metadata: string): Promise<string> {
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Returns '\n' when there is no audit so the message stays byte-identical to the old format.
+function buildAuditBlock(audit: ProposalAudit | null): string {
+  if (!audit || !isAuditComplete(audit)) return '\n';
+  const level = audit.assessment.risk?.level ?? 'unknown';
+  const label = level.charAt(0).toUpperCase() + level.slice(1);
+  return `\n\nyRisk Agentic Review:\n${escapeHtml(audit.assessment.summary)} Risk: ${label}.\n\n`;
+}
+
+export async function formatProposalData(
+  proposal: Proposal,
+  metadata: string,
+  audit: ProposalAudit | null = null
+): Promise<string> {
   const voteType = proposal.vote_type.toLowerCase().includes('ownership')
     ? 'Ownership'
     : proposal.vote_type.toLowerCase().includes('parameter')
@@ -93,6 +110,8 @@ export async function formatProposalData(proposal: Proposal, metadata: string): 
 
   const trusted = await checkIfIDisTrusted(proposal.vote_id);
 
+  const auditBlock = buildAuditBlock(audit);
+
   const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
 
   metadata = metadata.replace(/<>/g, '≺≻');
@@ -103,8 +122,7 @@ export async function formatProposalData(proposal: Proposal, metadata: string): 
   return `
     🗞️ New Proposal for ${voteType}
 
-${metadata}
-Requirements: ${quorum}m veCRV | Support: ${support}%
+${metadata}${auditBlock}Requirements: ${quorum}m veCRV | Support: ${support}%
 Links:${hyperlink(txHyperlink, 'etherscan')} |${hyperlink(curveURL, 'dao.curve.finance')} |${hyperlink(
     curvemonitorURL,
     'curvemonitor'
