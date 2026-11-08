@@ -98,7 +98,7 @@ export async function formatProposalData(proposal, metadata, audit = null) {
         metadata = metadata + '\n⚠️ Gauge was not deployed from trusted factory.';
     }
     return `
-    🗞️ New Proposal for ${voteType}
+    🗞️ New Proposal for ${voteType} | Vote ID: ${proposal.vote_id}
 
 ${metadata}${auditBlock}Requirements: ${quorum}m veCRV | Support: ${support}%
 Links:${hyperlink(txHyperlink, 'etherscan')} |${hyperlink(curveURL, 'dao.curve.finance')} |${hyperlink(curvemonitorURL, 'curvemonitor')} |${hyperlink(crvHubURL, 'crvhub')}
@@ -135,7 +135,7 @@ export async function formatPassedVoteData(proposal, metadata) {
     const crvHubURL = `https://crvhub.com/governance/${voteType.toLowerCase()}/${proposal.vote_id}`;
     const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
     return `
-  🗞️ Vote Passed ✓
+  🗞️ Vote Passed ✓ | ${voteType} Vote ID: ${proposal.vote_id}
 
 ${metadata}
 

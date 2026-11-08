@@ -120,7 +120,7 @@ export async function formatProposalData(
   }
 
   return `
-    🗞️ New Proposal for ${voteType}
+    🗞️ New Proposal for ${voteType} | Vote ID: ${proposal.vote_id}
 
 ${metadata}${auditBlock}Requirements: ${quorum}m veCRV | Support: ${support}%
 Links:${hyperlink(txHyperlink, 'etherscan')} |${hyperlink(curveURL, 'dao.curve.finance')} |${hyperlink(
@@ -164,7 +164,7 @@ export async function formatPassedVoteData(proposal: Proposal, metadata: string)
   const txHyperlink = getTxHashURLfromEtherscan(proposal.transaction_hash);
 
   return `
-  🗞️ Vote Passed ✓
+  🗞️ Vote Passed ✓ | ${voteType} Vote ID: ${proposal.vote_id}
 
 ${metadata}
 
