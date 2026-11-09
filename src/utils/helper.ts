@@ -69,6 +69,7 @@ export async function checkIfIDisTrusted(id: number) {
     {
       inputs: [
         { internalType: 'address', name: 'owner_', type: 'address' },
+        { internalType: 'address', name: 'initialManager_', type: 'address' },
         { internalType: 'address', name: 'proposalModule_', type: 'address' },
         {
           components: [
@@ -87,6 +88,11 @@ export async function checkIfIDisTrusted(id: number) {
     { inputs: [], name: 'InvalidPolicy', type: 'error' },
     { inputs: [{ internalType: 'address', name: 'target', type: 'address' }], name: 'MissingCode', type: 'error' },
     { inputs: [{ internalType: 'address', name: 'caller', type: 'address' }], name: 'NotOwner', type: 'error' },
+    {
+      inputs: [{ internalType: 'address', name: 'caller', type: 'address' }],
+      name: 'NotOwnerOrManager',
+      type: 'error',
+    },
     { inputs: [], name: 'ProposalModuleUnavailable', type: 'error' },
     { inputs: [], name: 'ZeroAddress', type: 'error' },
     {
@@ -97,6 +103,15 @@ export async function checkIfIDisTrusted(id: number) {
         { indexed: false, internalType: 'uint8', name: 'methodId', type: 'uint8' },
       ],
       name: 'FactoryPolicySet',
+      type: 'event',
+    },
+    {
+      anonymous: false,
+      inputs: [
+        { indexed: true, internalType: 'address', name: 'manager', type: 'address' },
+        { indexed: false, internalType: 'bool', name: 'enabled', type: 'bool' },
+      ],
+      name: 'ManagerSet',
       type: 'event',
     },
     {
@@ -154,6 +169,13 @@ export async function checkIfIDisTrusted(id: number) {
       type: 'function',
     },
     {
+      inputs: [{ internalType: 'address', name: 'manager', type: 'address' }],
+      name: 'managers',
+      outputs: [{ internalType: 'bool', name: 'enabled', type: 'bool' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
       inputs: [],
       name: 'owner',
       outputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -189,6 +211,16 @@ export async function checkIfIDisTrusted(id: number) {
       type: 'function',
     },
     {
+      inputs: [
+        { internalType: 'address', name: 'manager', type: 'address' },
+        { internalType: 'bool', name: 'enabled', type: 'bool' },
+      ],
+      name: 'setManager',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+    {
       inputs: [{ internalType: 'address', name: 'module', type: 'address' }],
       name: 'setProposalModule',
       outputs: [],
@@ -217,6 +249,6 @@ export async function checkIfIDisTrusted(id: number) {
       type: 'function',
     },
   ];
-  const contract = new web3HttpProvider.eth.Contract(abi, '0x999901076BB47Ae96d135C567610270d006B8684');
+  const contract = new web3HttpProvider.eth.Contract(abi, '0x888888c34a46d0b2A34e9204e5273208E670e784');
   return await contract.methods.validateProposalGauges(id).call();
 }
